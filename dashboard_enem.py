@@ -1,4 +1,4 @@
-/meu_dashboard
+meu_dashboard
 │
 ├─ dashboard_enem.py
 ├─ dados/
