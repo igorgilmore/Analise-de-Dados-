@@ -18,12 +18,13 @@ except Exception as e:
     st.stop()  # Para o app se não conseguir conectar
 
 # === 2. Buscar os dados da tabela ed_enem_2024_resultados ===
+# Tenta conectar no banco, se falhar, usa o CSV que está no GitHub
 try:
-    query = "SELECT * FROM ed_enem_2024_resultados;"
-    df = pd.read_sql(query, conn)
-except Exception as e:
-    st.error(f"Erro ao buscar os dados: {e}")
-    conn.close()
+    engine = create_engine("postgresql+psycopg2://data_iesb:iesb@bigdata.dataiesb.com:5432/iesb")
+    df = pd.read_sql("SELECT * FROM ed_enem_2024_resultados LIMIT 5000", engine) # LIMIT ajuda a não travar
+except Exception:
+    st.warning("Conexão com o banco falhou. Carregando dados do arquivo local...")
+    df = pd.read_csv('ed_enem_2024_resultados_amos_per.csv')
     st.stop()
 
 # Fechar conexão
