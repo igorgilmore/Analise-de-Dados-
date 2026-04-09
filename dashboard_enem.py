@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # ==============================
-# ESTILO AVANÇADO (UI PROFISSIONAL)
+# ESTILO (UI PROFISSIONAL)
 # ==============================
 st.markdown("""
 <style>
@@ -26,14 +26,6 @@ st.markdown("""
     h1, h2, h3 {
         color: #1F4E79;
         font-weight: 700;
-    }
-
-    .kpi-card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
-        border-left: 6px solid #1F4E79;
     }
 
     section[data-testid="stSidebar"] {
@@ -51,7 +43,7 @@ st.markdown("### Análise de Performance Educacional")
 st.caption("Autor: Igor Andrade • Versão 3.0 • Data Science & Analytics")
 
 # ==============================
-# FUNÇÃO DE DADOS
+# CARREGAMENTO DE DADOS
 # ==============================
 @st.cache_data(show_spinner="Carregando dados...")
 def load_data():
@@ -71,27 +63,27 @@ def load_data():
 df_raw, fonte = load_data()
 
 # ==============================
-# SIDEBAR PROFISSIONAL
+# SIDEBAR
 # ==============================
 with st.sidebar:
     st.title("🎛️ Painel de Controle")
 
-    st.subheader("📍 Filtros Geográficos")
+    st.subheader("📍 Filtros")
     ufs = sorted(df_raw["nome_uf_prova"].dropna().unique())
     ufs_sel = st.multiselect("Estados", ufs, default=ufs)
 
-    st.subheader("📊 Filtro de Nota")
+    st.subheader("📊 Nota")
     min_nota = int(df_raw["nota_mt_matematica"].min())
     max_nota = int(df_raw["nota_mt_matematica"].max())
 
     faixa = st.slider("Intervalo de Nota", min_nota, max_nota, (min_nota, max_nota))
 
     st.divider()
-    st.info(f"📌 Fonte: {fonte}")
-    st.caption(f"{len(df_raw):,} registros carregados")
+    st.info(f"Fonte: {fonte}")
+    st.caption(f"{len(df_raw):,} registros")
 
 # ==============================
-# FILTRO DE DADOS
+# FILTRO
 # ==============================
 df = df_raw[
     (df_raw["nome_uf_prova"].isin(ufs_sel)) &
@@ -99,19 +91,56 @@ df = df_raw[
 ]
 
 # ==============================
-# KPIs (VISUAL MELHORADO)
+# KPIs
 # ==============================
 st.markdown("## 📌 Indicadores Gerais")
 
 c1, c2, c3, c4 = st.columns(4)
 
 c1.metric("👨‍🎓 Alunos", f"{len(df):,}")
-c2.metric("📊 Média Matemática", f"{df['nota_mt_matematica'].mean():.1f}")
+c2.metric("📊 Média", f"{df['nota_mt_matematica'].mean():.1f}")
 c3.metric("🏙️ Municípios", df['no_municipio_prova'].nunique())
 c4.metric("🗺️ Estados", df['nome_uf_prova'].nunique())
 
 # ==============================
-# TABS (PROFISSIONAL)
+# ESTATÍSTICAS DESCRITIVAS
+# ==============================
+st.markdown("## 📊 Estatísticas Descritivas")
+
+stats = df["nota_mt_matematica"].describe()
+
+c1, c2, c3, c4, c5 = st.columns(5)
+
+c1.metric("Mínimo", f"{stats['min']:.1f}")
+c2.metric("Q1", f"{stats['25%']:.1f}")
+c3.metric("Mediana", f"{stats['50%']:.1f}")
+c4.metric("Q3", f"{stats['75%']:.1f}")
+c5.metric("Máximo", f"{stats['max']:.1f}")
+
+st.caption(f"Desvio padrão: {stats['std']:.2f}")
+
+# ==============================
+# INSIGHTS AUTOMÁTICOS
+# ==============================
+st.markdown("## 🧠 Insights Automáticos")
+
+media_geral = df["nota_mt_matematica"].mean()
+
+melhor_estado = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmax()
+pior_estado = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmin()
+
+st.success(f"""
+📌 A média geral foi **{media_geral:.1f} pontos**.
+
+🏆 Melhor desempenho: **{melhor_estado}**
+
+⚠️ Pior desempenho: **{pior_estado}**
+
+📊 Há variações relevantes entre os estados.
+""")
+
+# ==============================
+# TABS
 # ==============================
 tab1, tab2, tab3 = st.tabs(["📈 Análise Geral", "📊 Distribuições", "🌍 Geoespacial"])
 
@@ -145,8 +174,7 @@ with tab1:
         fig2 = px.treemap(
             df,
             path=["nome_uf_prova"],
-            title="Distribuição de Participação",
-            color_discrete_sequence=px.colors.qualitative.Pastel
+            title="Distribuição de Participação"
         )
 
         st.plotly_chart(fig2, use_container_width=True)
@@ -175,12 +203,28 @@ with tab2:
         fig4 = px.histogram(
             df,
             x="nota_mt_matematica",
-            nbins=50,
+            nbins=60,
             marginal="box",
             color_discrete_sequence=["#1F4E79"],
             title="Distribuição das Notas"
         )
         st.plotly_chart(fig4, use_container_width=True)
+
+    # BOXPLOT
+    st.subheader("📦 Boxplot por Estado")
+
+    fig_box = px.box(
+        df,
+        x="nome_uf_prova",
+        y="nota_mt_matematica",
+        color="nome_uf_prova",
+        points="outliers",
+        title="Distribuição das Notas por Estado"
+    )
+
+    fig_box.update_layout(showlegend=False)
+
+    st.plotly_chart(fig_box, use_container_width=True)
 
 # ==============================
 # TAB 3 (MAPA)
