@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -59,7 +60,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 }
 .kpi-label { font-size: 0.88rem; color: #8a94b8; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
 
-/* ── Section headings ── */
 .section-title {
     font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
     color: #b0bcd8; letter-spacing: 0.06em; text-transform: uppercase;
@@ -147,7 +147,7 @@ with st.sidebar:
     )
 
     faixa = st.slider(
-        "Faixa de Nota — Matemática",
+        "Faixa de Nota - Matematica",
         int(df_raw["nota_mt_matematica"].min()),
         int(df_raw["nota_mt_matematica"].max()),
         (300, 800)
@@ -180,9 +180,9 @@ st.markdown("""
 # ==============================
 kpis = [
     ("👤", len(df), "Candidatos", "#5c7cfa"),
-    ("📐", round(df["nota_mt_matematica"].mean(), 1), "Média Matemática", "#34d399"),
+    ("📐", round(df["nota_mt_matematica"].mean(), 1), "Media Matematica", "#34d399"),
     ("🗺", df["nome_uf_prova"].nunique(), "Estados", "#f59e0b"),
-    ("📍", df["no_municipio_prova"].nunique(), "Municípios", "#a78bfa"),
+    ("📍", df["no_municipio_prova"].nunique(), "Municipios", "#a78bfa"),
 ]
 
 cols = st.columns(4)
@@ -196,20 +196,20 @@ for col, (icon, value, label, color) in zip(cols, kpis):
     """, unsafe_allow_html=True)
 
 # ==============================
-# ESTATÍSTICA
+# ESTATISTICA DESCRITIVA
 # ==============================
-st.markdown('<p class="section-title">📊 Estatística Descritiva</p>', unsafe_allow_html=True)
+st.markdown('<p class="section-title">📊 Estatistica Descritiva</p>', unsafe_allow_html=True)
 desc = df["nota_mt_matematica"].describe().reset_index()
-desc.columns = ["Métrica", "Valor"]
-desc["Métrica"] = desc["Métrica"].map({
+desc.columns = ["Metrica", "Valor"]
+desc["Metrica"] = desc["Metrica"].map({
     "count": "Total de Candidatos",
-    "mean":  "Média",
-    "std":   "Desvio Padrão",
-    "min":   "Mínimo",
-    "25%":   "1º Quartil (25%)",
+    "mean":  "Media",
+    "std":   "Desvio Padrao",
+    "min":   "Minimo",
+    "25%":   "1o Quartil (25%)",
     "50%":   "Mediana (50%)",
-    "75%":   "3º Quartil (75%)",
-    "max":   "Máximo",
+    "75%":   "3o Quartil (75%)",
+    "max":   "Maximo",
 })
 desc["Valor"] = desc["Valor"].apply(lambda x: f"{x:,.1f}")
 st.dataframe(desc, use_container_width=True, hide_index=True)
@@ -220,48 +220,48 @@ st.dataframe(desc, use_container_width=True, hide_index=True)
 st.markdown("<br>", unsafe_allow_html=True)
 tab1, tab2, tab3, tab4 = st.tabs([
     "  📈 Geral  ",
-    "  📊 Distribuição  ",
-    "  🧠 Inteligência  ",
+    "  📊 Distribuicao  ",
+    "  🧠 Inteligencia  ",
     "  🤖 Machine Learning  "
 ])
 
-# ── TAB 1 ──
+# TAB 1
 with tab1:
     col1, col2 = st.columns([1.2, 1])
     media = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().sort_values()
 
-    fig_bar = px.bar(media, orientation="h", title="Ranking por Estado — Média Matemática",
+    fig_bar = px.bar(media, orientation="h", title="Ranking por Estado - Media Matematica",
         color=media.values, color_continuous_scale=[[0, "#1e2a4a"], [0.5, "#5c7cfa"], [1, "#34d399"]])
     fig_bar.update_coloraxes(showscale=False)
     fig_bar.update_traces(marker_line_width=0)
     apply_theme(fig_bar)
     col1.plotly_chart(fig_bar, use_container_width=True)
 
-    fig_tree = px.treemap(df, path=["nome_uf_prova"], title="Participação por Estado",
+    fig_tree = px.treemap(df, path=["nome_uf_prova"], title="Participacao por Estado",
         color_discrete_sequence=["#5c7cfa", "#34d399", "#f59e0b", "#f87171", "#a78bfa", "#38bdf8"])
     fig_tree.update_traces(marker=dict(line=dict(width=2, color="#0a0d14")))
     apply_theme(fig_tree)
     col2.plotly_chart(fig_tree, use_container_width=True)
 
-# ── TAB 2 ──
+# TAB 2
 with tab2:
     col3, col4 = st.columns(2)
 
     fig_hist = px.histogram(df, x="nota_mt_matematica", marginal="box",
-        title="Distribuição de Notas — Matemática", color_discrete_sequence=["#5c7cfa"])
+        title="Distribuicao de Notas - Matematica", color_discrete_sequence=["#5c7cfa"])
     fig_hist.update_traces(marker_line_width=0, opacity=0.85)
     apply_theme(fig_hist)
     col3.plotly_chart(fig_hist, use_container_width=True)
 
-    fig_box = px.box(df, x="nome_uf_prova", y="nota_mt_matematica", title="Dispersão por Estado",
+    fig_box = px.box(df, x="nome_uf_prova", y="nota_mt_matematica", title="Dispersao por Estado",
         color="nome_uf_prova", color_discrete_sequence=px.colors.qualitative.Safe)
     fig_box.update_layout(showlegend=False)
     apply_theme(fig_box)
     col4.plotly_chart(fig_box, use_container_width=True)
 
-# ── TAB 3 ──
+# TAB 3
 with tab3:
-    st.markdown('<p class="section-title">🔗 Mapa de Correlação</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-title">🔗 Mapa de Correlacao</p>', unsafe_allow_html=True)
 
     numeric_df = df.select_dtypes(include=np.number).drop(
         columns=[c for c in ["longitude", "latitude"] if c in df.columns]
@@ -271,24 +271,24 @@ with tab3:
         corr = numeric_df.corr()
         fig_corr = px.imshow(corr, text_auto=".2f",
             color_continuous_scale=[[0, "#f87171"], [0.5, "#0f1320"], [1, "#5c7cfa"]],
-            title="Correlação entre Variáveis Numéricas", zmin=-1, zmax=1)
+            title="Correlacao entre Variaveis Numericas", zmin=-1, zmax=1)
         fig_corr.update_traces(textfont_size=14, textfont_color="#ffffff")
         apply_theme(fig_corr)
         st.plotly_chart(fig_corr, use_container_width=True)
 
     col_lc = "nota_lc_linguagens_e_codigos"
     if col_lc in df.columns:
-        st.markdown('<p class="section-title">📉 Regressão Linear</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">📉 Regressao Linear</p>', unsafe_allow_html=True)
         fig_reg = px.scatter(df.sample(min(2000, len(df))), x=col_lc, y="nota_mt_matematica",
-            trendline="ols", title="Matemática × Linguagens & Códigos",
+            trendline="ols", title="Matematica x Linguagens e Codigos",
             color_discrete_sequence=["#5c7cfa"], opacity=0.5)
         fig_reg.update_traces(marker=dict(size=5))
         apply_theme(fig_reg)
         st.plotly_chart(fig_reg, use_container_width=True)
 
-# ── TAB 4 ──
+# TAB 4
 with tab4:
-    st.markdown('<p class="section-title">🤖 Clusterização K-Means</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-title">🤖 Clusterizacao K-Means</p>', unsafe_allow_html=True)
 
     col_lc = "nota_lc_linguagens_e_codigos"
     if col_lc in df.columns:
@@ -299,7 +299,7 @@ with tab4:
         features["Cluster"] = features["Cluster"].map({"0": "Grupo A", "1": "Grupo B", "2": "Grupo C"})
 
         fig_cluster = px.scatter(features, x=col_lc, y="nota_mt_matematica", color="Cluster",
-            title="Segmentação de Candidatos",
+            title="Segmentacao de Candidatos",
             color_discrete_map={"Grupo A": "#5c7cfa", "Grupo B": "#34d399", "Grupo C": "#f59e0b"},
             opacity=0.65)
         fig_cluster.update_traces(marker=dict(size=5, line=dict(width=0)))
@@ -308,12 +308,43 @@ with tab4:
 
         summary = features.groupby("Cluster").agg(
             Candidatos=("nota_mt_matematica", "count"),
-            Média_Matemática=("nota_mt_matematica", "mean"),
-            Média_Linguagens=(col_lc, "mean")
+            Media_Matematica=("nota_mt_matematica", "mean"),
+            Media_Linguagens=(col_lc, "mean")
         ).round(1).reset_index()
         summary["Candidatos"] = summary["Candidatos"].apply(lambda x: f"{x:,}")
-        summary["Média_Matemática"] = summary["Média_Matemática"].apply(lambda x: f"{x:.1f}")
-        summary["Média_Linguagens"] = summary["Média_Linguagens"].apply(lambda x: f"{x:.1f}")
+        summary["Media_Matematica"] = summary["Media_Matematica"].apply(lambda x: f"{x:.1f}")
+        summary["Media_Linguagens"] = summary["Media_Linguagens"].apply(lambda x: f"{x:.1f}")
         st.dataframe(summary, use_container_width=True, hide_index=True)
     else:
-        st.info("Coluna de Linguagens não encon
+        st.info("Coluna de Linguagens nao encontrada nos dados carregados.")
+
+# ==============================
+# INSIGHTS
+# ==============================
+st.markdown('<p class="section-title">🧠 Insights Automaticos</p>', unsafe_allow_html=True)
+
+melhor = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmax()
+pior = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmin()
+diff = (
+    df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().max()
+    - df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().min()
+)
+
+st.markdown(f"""
+<div class="insight-box">
+    <p>🏆 <strong>Melhor estado:</strong> {melhor}</p>
+    <p>⚠️ <strong>Pior estado:</strong> {pior}</p>
+    <p>📏 <strong>Diferenca entre extremos:</strong> {diff:.1f} pontos - indica desigualdade educacional regional relevante.</p>
+</div>
+""", unsafe_allow_html=True)
+
+# ==============================
+# DOWNLOAD
+# ==============================
+st.markdown("<br>", unsafe_allow_html=True)
+st.download_button(
+    "📥 Baixar dados filtrados (.csv)",
+    df.to_csv(index=False),
+    "dados_enem_filtrados.csv",
+    mime="text/csv"
+)
