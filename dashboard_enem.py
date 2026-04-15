@@ -52,13 +52,17 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     content: ''; position: absolute; top: 0; left: 0; right: 0;
     height: 2px; background: var(--accent); border-radius: 14px 14px 0 0;
 }
-.kpi-icon { font-size: 1.1rem; margin-bottom: 0.7rem; opacity: 0.7; }
-.kpi-value { font-family: 'Syne', sans-serif; font-size: 2.1rem; font-weight: 700; color: #e8eaf0; line-height: 1; margin-bottom: 0.3rem; }
-.kpi-label { font-size: 0.75rem; color: #5a6080; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+.kpi-icon { font-size: 1.4rem; margin-bottom: 0.8rem; opacity: 0.85; }
+.kpi-value {
+    font-family: 'Syne', sans-serif; font-size: 2.6rem; font-weight: 800;
+    color: #ffffff; line-height: 1; margin-bottom: 0.5rem; letter-spacing: -0.02em;
+}
+.kpi-label { font-size: 0.88rem; color: #8a94b8; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
 
+/* ── Section headings ── */
 .section-title {
-    font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700;
-    color: #9aa3c0; letter-spacing: 0.08em; text-transform: uppercase;
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: #b0bcd8; letter-spacing: 0.06em; text-transform: uppercase;
     margin: 2rem 0 1rem; display: flex; align-items: center; gap: 0.5rem;
 }
 .section-title::after { content: ''; flex: 1; height: 1px; background: #1e2438; margin-left: 0.5rem; }
@@ -67,9 +71,13 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 [data-testid="stTabs"] button[role="tab"] { border-radius: 7px !important; color: #5a6080 !important; font-family: 'DM Sans', sans-serif !important; font-size: 0.85rem !important; font-weight: 500 !important; padding: 0.5rem 1.2rem !important; transition: all 0.15s !important; }
 [data-testid="stTabs"] button[role="tab"][aria-selected="true"] { background: #1e2a4a !important; color: #7ba7ff !important; }
 
-.insight-box { background: linear-gradient(135deg, #111a30, #0d1525); border: 1px solid #1e3a6e; border-left: 3px solid #5c7cfa; border-radius: 10px; padding: 1.2rem 1.5rem; margin-top: 0.5rem; }
-.insight-box p { margin: 0.2rem 0; color: #b0bcd8; font-size: 0.9rem; line-height: 1.6; }
-.insight-box strong { color: #7ba7ff; }
+.insight-box {
+    background: linear-gradient(135deg, #111a30, #0d1525);
+    border: 1px solid #1e3a6e; border-left: 3px solid #5c7cfa;
+    border-radius: 10px; padding: 1.5rem 1.8rem; margin-top: 0.5rem;
+}
+.insight-box p { margin: 0.4rem 0; color: #c8ccd8; font-size: 1rem; line-height: 1.7; }
+.insight-box strong { color: #7ba7ff; font-size: 1.05rem; }
 
 [data-testid="stDownloadButton"] button { background: #1e2a4a !important; border: 1px solid #2e3f6e !important; color: #7ba7ff !important; border-radius: 8px !important; font-family: 'DM Sans', sans-serif !important; font-weight: 500 !important; font-size: 0.85rem !important; letter-spacing: 0.03em !important; padding: 0.5rem 1.2rem !important; transition: all 0.15s !important; }
 [data-testid="stDownloadButton"] button:hover { background: #253561 !important; border-color: #5c7cfa !important; }
@@ -86,11 +94,20 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 PLOTLY_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="DM Sans, sans-serif", color="#9aa3c0", size=12),
-    title_font=dict(family="Syne, sans-serif", color="#c8ccd8", size=15),
-    xaxis=dict(gridcolor="#1e2438", linecolor="#1e2438", tickfont=dict(color="#5a6080")),
-    yaxis=dict(gridcolor="#1e2438", linecolor="#1e2438", tickfont=dict(color="#5a6080")),
-    margin=dict(l=20, r=20, t=50, b=20),
+    font=dict(family="DM Sans, sans-serif", color="#c8ccd8", size=14),
+    title_font=dict(family="Syne, sans-serif", color="#ffffff", size=18),
+    xaxis=dict(
+        gridcolor="#1e2438", linecolor="#1e2438",
+        tickfont=dict(color="#c8ccd8", size=13),
+        title_font=dict(color="#e8eaf0", size=14),
+    ),
+    yaxis=dict(
+        gridcolor="#1e2438", linecolor="#1e2438",
+        tickfont=dict(color="#c8ccd8", size=13),
+        title_font=dict(color="#e8eaf0", size=14),
+    ),
+    legend=dict(font=dict(color="#c8ccd8", size=13)),
+    margin=dict(l=20, r=20, t=60, b=20),
     colorway=["#5c7cfa", "#34d399", "#f59e0b", "#f87171", "#a78bfa", "#38bdf8"],
 )
 
@@ -184,7 +201,17 @@ for col, (icon, value, label, color) in zip(cols, kpis):
 st.markdown('<p class="section-title">📊 Estatística Descritiva</p>', unsafe_allow_html=True)
 desc = df["nota_mt_matematica"].describe().reset_index()
 desc.columns = ["Métrica", "Valor"]
-desc["Valor"] = desc["Valor"].round(2)
+desc["Métrica"] = desc["Métrica"].map({
+    "count": "Total de Candidatos",
+    "mean":  "Média",
+    "std":   "Desvio Padrão",
+    "min":   "Mínimo",
+    "25%":   "1º Quartil (25%)",
+    "50%":   "Mediana (50%)",
+    "75%":   "3º Quartil (75%)",
+    "max":   "Máximo",
+})
+desc["Valor"] = desc["Valor"].apply(lambda x: f"{x:,.1f}")
 st.dataframe(desc, use_container_width=True, hide_index=True)
 
 # ==============================
@@ -245,7 +272,7 @@ with tab3:
         fig_corr = px.imshow(corr, text_auto=".2f",
             color_continuous_scale=[[0, "#f87171"], [0.5, "#0f1320"], [1, "#5c7cfa"]],
             title="Correlação entre Variáveis Numéricas", zmin=-1, zmax=1)
-        fig_corr.update_traces(textfont_size=10)
+        fig_corr.update_traces(textfont_size=14, textfont_color="#ffffff")
         apply_theme(fig_corr)
         st.plotly_chart(fig_corr, use_container_width=True)
 
@@ -281,40 +308,12 @@ with tab4:
 
         summary = features.groupby("Cluster").agg(
             Candidatos=("nota_mt_matematica", "count"),
-            Média_MT=("nota_mt_matematica", "mean"),
-            Média_LC=(col_lc, "mean")
+            Média_Matemática=("nota_mt_matematica", "mean"),
+            Média_Linguagens=(col_lc, "mean")
         ).round(1).reset_index()
+        summary["Candidatos"] = summary["Candidatos"].apply(lambda x: f"{x:,}")
+        summary["Média_Matemática"] = summary["Média_Matemática"].apply(lambda x: f"{x:.1f}")
+        summary["Média_Linguagens"] = summary["Média_Linguagens"].apply(lambda x: f"{x:.1f}")
         st.dataframe(summary, use_container_width=True, hide_index=True)
     else:
-        st.info("Coluna de Linguagens não encontrada nos dados carregados.")
-
-# ==============================
-# INSIGHTS
-# ==============================
-st.markdown('<p class="section-title">🧠 Insights Automáticos</p>', unsafe_allow_html=True)
-
-melhor = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmax()
-pior = df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().idxmin()
-diff = (
-    df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().max()
-    - df.groupby("nome_uf_prova")["nota_mt_matematica"].mean().min()
-)
-
-st.markdown(f"""
-<div class="insight-box">
-    <p>🏆 <strong>Melhor estado:</strong> {melhor}</p>
-    <p>⚠️ <strong>Pior estado:</strong> {pior}</p>
-    <p>📏 <strong>Diferença entre extremos:</strong> {diff:.1f} pontos — indica desigualdade educacional regional relevante.</p>
-</div>
-""", unsafe_allow_html=True)
-
-# ==============================
-# DOWNLOAD
-# ==============================
-st.markdown("<br>", unsafe_allow_html=True)
-st.download_button(
-    "📥 Baixar dados filtrados (.csv)",
-    df.to_csv(index=False),
-    "dados_enem_filtrados.csv",
-    mime="text/csv"
-)
+        st.info("Coluna de Linguagens não encon
